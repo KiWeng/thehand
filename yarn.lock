@@ -449,6 +449,11 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@solid-primitives/websocket@^0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/websocket/-/websocket-0.3.7.tgz#8bad497a6bcdbede6c68cc1a26d36e80f9cca0eb"
+  integrity sha512-k2tRfBEpzTCt2qGW6j5O265wmjbosNjBPMbADO8Kcznml61NvH7PK9ZBCe3PCpjCGaRusrpZpKnnRUJPdM31fw==
+
 "@types/babel__core@^7.1.20":
   version "7.20.0"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.20.0.tgz#61bc5a4cae505ce98e1e36c5445e4bee060d8891"
