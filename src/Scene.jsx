@@ -79,11 +79,6 @@ function Scene(props) {
 
   function animate() {
     requestAnimationFrame(animate)
-    //     /*
-    //     curl: 50hz pre 1000 (20s) post 1000 (20s)
-    //     emg: 2000hz->50hz pre 1000 post 1000 diff 10
-    //      */
-    // if (frame_count + 2 < progress) frame_count += 1
     predictHand.updateHandPoseEach(predict_curl[0])
     controls.update()
     render()
