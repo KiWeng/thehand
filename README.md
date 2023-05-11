@@ -4,10 +4,11 @@
 
 ### Basics
 
-- [ ] A threejs rendered hand as background
+- [x] A threejs rendered hand as background
 - [ ] Menu with following options:
     - [ ] Begin calibration
     - [ ] Load profile
+      - [ ] Popout dialog for model selection
     - [ ] Begin prediction
 
 ### Calibration session
@@ -18,8 +19,9 @@
 ### Prediction session
 
 - [ ] Post start&end request to the server
-- [ ] Receiving predicted data@50Hz with websocket
-- [ ] Show hands
+- [x] Receiving predicted data@50Hz with websocket
+  - *@12Hz roughly due to the processing speed of the server*
+- [x] Show hands
 
 ### Miscellaneous
 

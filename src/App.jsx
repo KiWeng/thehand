@@ -1,32 +1,64 @@
 import Scene from "./Scene";
-import {createSignal} from "solid-js";
+import {createEffect, createSignal} from "solid-js";
 import createWebsocket from "@solid-primitives/websocket";
-
-const example_data = {
-  "action": "sent",
-  "prediction": [[3.8975167274475098, 7.749725341796875, 6.8757524490356445, 6.921577453613281, 7.2840256690979]]
-}
+import Panel from "./Panel";
 
 function App() {
   let id = 0
 
-  const [data, setData] = createSignal([]);
-  const [connect, disconnect, send, state] = createWebsocket(
-    "ws://localhost:8081/infer/" + id,
+  const [data, setData] = createSignal([[0, 0, 0, 0, 0]]);
+  const [mode, setMode] = createSignal("inactive")
+  const [model, setModel] = createSignal(0)
+
+
+  createEffect(() => {
+    console.log(mode());
+    switch (mode()) {
+      case "recognition":
+        infer_connect()
+        break
+      case "calibration":
+        calibrate_connect()
+        break
+    }
+  })
+
+  const [infer_connect, infer_disconnect] = createWebsocket(
+    "ws://localhost:8081/infer/" + model,
     (msg) => {
       const response = JSON.parse(msg.data)
       setData(response.prediction)
     },
-    (msg) => console.log(msg),
+    (msg) => {
+      console.log(msg)
+      setMode("inactive")
+    },
     [],
     5,
     5000
   );
 
-  connect()
+  const [calibrate_connect, calibrate_disconnect, send, state] = createWebsocket(
+    "ws://localhost:8081/calibrate/" + model,
+    (msg) => {
+      const response = JSON.parse(msg.data)
+      setData(response.prediction)
+    },
+    (msg) => {
+      console.log(msg)
+      setMode("inactive")
+    },
+    [],
+    5,
+    5000
+  );
+
 
   return (
-    <Scene curls={data}/>
+    <>
+      <Panel mode={mode} setMode={setMode}/>
+      <Scene curls={data} mode={mode} setMode={setMode}/>
+    </>
   );
 }
 
