@@ -10,3 +10,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
   monospace;
 }
+
+.panel-button {
+  width: inherit;
+  display: inline-block;
+  position: absolute;
+  bottom: 0;
+  width: -webkit-fill-available;
+}
+
+.panel {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}

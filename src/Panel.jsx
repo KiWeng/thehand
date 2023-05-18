@@ -1,4 +1,4 @@
-import {Column, Row} from "@papanasi/solid";
+import {Column, Container, Row} from "@papanasi/solid";
 import "@papanasi/solid/papanasi.css"
 import "./button.css"
 
@@ -9,19 +9,26 @@ function Panel(props) {
     }
   }
 
-  return <>
+  return <div className="panel pa-container pa-container--fluid ">
     <Row basic="content">
       <Column basic="fill">
-        <button variant="primary" onClick={() => switchMode("calibration")}>Start calibration</button>
+        <button onClick={() => switchMode("calibration")} className="pa-button--primary pa-button panel-button">Start
+          calibration
+        </button>
       </Column>
       <Column basic="fill">
-        <button variant="secondary">Select model</button>
+        <button className="pa-button--secondary pa-button panel-button">Select model</button>
       </Column>
       <Column basic="fill">
-        <button variant="tertiary" onClick={() => switchMode('recognition')}>Start Recognition</button>
+        <button onClick={() => switchMode('recognition')} className="pa-button--tertiary pa-button panel-button">Start
+          Recognition
+        </button>
       </Column>
     </Row>
-  </>
+<div>
+    <a>{props.mode()}</a>
+</div>
+  </div>
 }
 
 export default Panel;
