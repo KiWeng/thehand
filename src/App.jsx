@@ -1,7 +1,8 @@
 import Scene from "./Scene";
-import {createEffect, createSignal} from "solid-js";
+import {createEffect, createSignal, Show} from "solid-js";
 import createWebsocket from "@solid-primitives/websocket";
 import Panel from "./Panel";
+import ModelModal from "./ModelModal"
 
 function App() {
   let id = 0
@@ -9,7 +10,15 @@ function App() {
   const [data, setData] = createSignal([[0, 0, 0, 0, 0]]);
   const [mode, setMode] = createSignal("inactive")
   const [model, setModel] = createSignal(0)
+  const [modalVisibility, setModalVisibility] = createSignal(false)
 
+  let toggleModalVisibility = () => {
+    setModalVisibility(!modalVisibility())
+  }
+
+  createEffect(() => {
+    console.log(model())
+  })
 
   createEffect(() => {
     console.log(mode());
@@ -56,8 +65,11 @@ function App() {
 
   return (
     <>
-      <Panel mode={mode} setMode={setMode}/>
+      <Panel mode={mode} setMode={setMode} toggleModalVisibility={toggleModalVisibility}/>
       <Scene curls={data} mode={mode} setMode={setMode}/>
+      <Show when={modalVisibility() === true} fallback={<div/>}>
+        <ModelModal model={model} setModel={setModel}/>
+      </Show>
     </>
   );
 }
