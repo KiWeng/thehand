@@ -13,17 +13,21 @@ function Panel(props) {
     <div className="panel pa-container pa-container--fluid ">
       <Row basic="content">
         <Column basic="fill">
-          <button onClick={() => switchMode("calibration")} className="pa-button--primary pa-button panel-button">Start
-            calibration
+          <button onClick={() => {
+            switchMode("calibration")
+          }} className="pa-button--primary pa-button panel-button">Start
+            Calibration
           </button>
         </Column>
         <Column basic="fill">
           <button onClick={() => props.toggleModalVisibility()}
-                  className="pa-button--secondary pa-button panel-button">Select model
+                  className="pa-button--secondary pa-button panel-button">Select Model
           </button>
         </Column>
         <Column basic="fill">
-          <button onClick={() => switchMode('recognition')} className="pa-button--tertiary pa-button panel-button">Start
+          <button onClick={() => {
+            switchMode('recognition')
+          }} className="pa-button--tertiary pa-button panel-button">Start
             Recognition
           </button>
         </Column>

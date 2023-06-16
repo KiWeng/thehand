@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@papanasi/solid": "^1.1.0",
-    "@solid-primitives/websocket": "^0.3.7",
+    "@solid-primitives/websocket": "^1.1.0",
     "highlight.js": "^11.8.0",
     "ofetch": "^1.0.1",
     "solid-js": "^1.6.10",
