@@ -3,32 +3,34 @@ import "@papanasi/solid/papanasi.css"
 import "./button.css"
 
 function Panel(props) {
-  let switchMode = (mode) => {
-    if (props.mode() === "inactive") {
-      props.setMode(mode)
-    }
-  }
-
   return <div className="panel-wrapper">
     <div className="panel pa-container pa-container--fluid ">
       <Row basic="content">
         <Column basic="fill">
           <button onClick={() => {
-            switchMode("calibration")
-          }} className="pa-button--primary pa-button panel-button">Start
-            Calibration
+            props.switchMode("calibration")
+          }} className={`pa-button--primary pa-button panel-button ${
+            props.mode() === "recognition" ? "is-disabled" : ""
+          }`}>Start Calibration
           </button>
         </Column>
         <Column basic="fill">
           <button onClick={() => props.toggleModalVisibility()}
-                  className="pa-button--secondary pa-button panel-button">Select Model
+                  className={`pa-button--secondary pa-button panel-button ${
+                    props.mode() === "inactive" ? "" : "is-disabled"
+                  }`}>Select Model
           </button>
         </Column>
         <Column basic="fill">
           <button onClick={() => {
-            switchMode('recognition')
-          }} className="pa-button--tertiary pa-button panel-button">Start
-            Recognition
+            if (props.mode() === 'inactive') {
+              props.switchMode('recognition')
+            } else {
+              props.switchMode('inactive')
+            }
+          }} className={`pa-button--tertiary pa-button panel-button ${
+            props.mode() === "calibration" ? "is-disabled" : ""
+          }`}> {props.mode() === 'recognition' ? "Stop" : "Start"} Recognition
           </button>
         </Column>
       </Row>
