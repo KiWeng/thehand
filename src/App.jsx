@@ -1,5 +1,5 @@
 import Scene from "./Scene";
-import {createEffect, createSignal, on, Show} from "solid-js";
+import {createEffect, createSignal, Show} from "solid-js";
 import {createWS} from "@solid-primitives/websocket";
 import Panel from "./Panel";
 import ModelModal from "./ModelModal"
@@ -12,6 +12,24 @@ function App() {
   const [model, setModel] = createSignal(0)
   const [modalVisibility, setModalVisibility] = createSignal(false)
 
+  let ws = null
+  let switchMode = (targetMode) => {
+    switch (mode()) {
+      case "inactive":
+        setMode(targetMode)
+        break
+      case "recognition":
+        if (ws !== null) {
+          ws.send("close")
+          ws.close();
+          console.log(ws);
+        }
+        break
+      case "calibration":
+        break
+    }
+  }
+
   let toggleModalVisibility = () => {
     setModalVisibility(!modalVisibility())
   }
@@ -20,10 +38,9 @@ function App() {
     console.log(mode());
     switch (mode()) {
       case "recognition":
-        infer_connect()
+        start_infer()
         break
       case "calibration":
-        // calibrate_connect()
         start_calibration()
         break
     }
@@ -75,21 +92,19 @@ function App() {
   }
 
   const start_infer = () => {
-    const ws = createWS("ws://localhost:8081/infer/" + model)
-    createEffect(on(ws.message, msg => {
-      const response = JSON.parse(msg.data)
+    ws = createWS("ws://localhost:8081/infer/" + model)
+    ws.addEventListener("message", e => {
+      const response = JSON.parse(e.data)
       setData(response.prediction)
-    }))
-    createEffect(on(ws.close, msg => {
-        console.log(msg)
-        setMode("inactive")
-      },
-    ))
+    })
+    ws.addEventListener("close", e => {
+      setMode("inactive")
+    })
   }
 
   return (
     <>
-      <Panel mode={mode} setMode={setMode} toggleModalVisibility={toggleModalVisibility}/>
+      <Panel mode={mode} switchMode={switchMode} toggleModalVisibility={toggleModalVisibility}/>
       <Scene curls={data} mode={mode} setMode={setMode}/>
       <Show when={modalVisibility() === true} fallback={<div/>}>
         <ModelModal model={model} setModel={setModel}/>
