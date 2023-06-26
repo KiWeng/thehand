@@ -20,9 +20,6 @@ function ListElement(props) {
 }
 
 export default function ModelModal(props) {
-  let modelList = [
-    114, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
-  ]
 
   return <div className="modal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div className="modal-dialog">
@@ -32,7 +29,7 @@ export default function ModelModal(props) {
         </div>
         <hr style="color: #dadada; margin: 8px"/>
         <div className="modal-body">
-          <For each={modelList}>
+          <For each={props.modelList()}>
             {(item, index) => <ListElement item={item} index={index} model={props.model} setModel={props.setModel}/>}
           </For>
         </div>

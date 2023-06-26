@@ -9,8 +9,16 @@ function App() {
 
   const [data, setData] = createSignal([[0, 0, 0, 0, 0]]);
   const [mode, setMode] = createSignal("inactive")
-  const [model, setModel] = createSignal(0)
+  const [model, setModel] = createSignal("base")
+  const [modelList, setModelList] = createSignal([])
   const [modalVisibility, setModalVisibility] = createSignal(false)
+
+  const fetchModelList = async () => {
+    await fetch('http://127.0.0.1:8081/models/',)
+      .then(response => response.json())
+      .then(data => setModelList(data['models']))
+  }
+
 
   let ws = null
   let switchMode = (targetMode) => {
@@ -32,6 +40,10 @@ function App() {
 
   let toggleModalVisibility = () => {
     setModalVisibility(!modalVisibility())
+    if (modalVisibility()) {
+      fetchModelList().then(r => {
+      })
+    }
   }
 
   createEffect(() => {
@@ -107,7 +119,7 @@ function App() {
       <Panel mode={mode} switchMode={switchMode} toggleModalVisibility={toggleModalVisibility}/>
       <Scene curls={data} mode={mode} setMode={setMode}/>
       <Show when={modalVisibility() === true} fallback={<div/>}>
-        <ModelModal model={model} setModel={setModel}/>
+        <ModelModal model={model} setModel={setModel} modelList={modelList}/>
       </Show>
     </>
   );
