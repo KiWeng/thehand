@@ -12,6 +12,8 @@ function App() {
   const [model, setModel] = createSignal("base")
   const [modelList, setModelList] = createSignal([])
   const [modalVisibility, setModalVisibility] = createSignal(false)
+  const [calibrationState, setCalibrationState] = createSignal("")
+  const [accum, setAccum] = createSignal(0)
 
   const fetchModelList = async () => {
     await fetch('http://127.0.0.1:8081/models/',)
@@ -26,14 +28,13 @@ function App() {
       case "inactive":
         setMode(targetMode)
         break
+      case "calibration":
       case "recognition":
         if (ws !== null) {
           ws.send("close")
           ws.close();
           console.log(ws);
         }
-        break
-      case "calibration":
         break
     }
   }
@@ -45,6 +46,17 @@ function App() {
       })
     }
   }
+
+
+  createEffect(() => {
+    console.log(calibrationState());
+    switch (calibrationState()) {
+      case "calibration finished":
+        switchMode("inactive")
+        break
+    }
+  })
+
 
   createEffect(() => {
     console.log(mode());
@@ -60,51 +72,71 @@ function App() {
 
   // TOOD: post start&end request
   const start_calibration = () => {
-    let accum = 0
-    let intervalFunc = setInterval(() => {
-      let finger = Math.floor(accum / 300)
-      let fp = (accum / 300) - finger
-      console.log(finger, fp)
+    // ws = createWS("ws://localhost:8081/calibration/" + model) TODO
+    ws = createWS("ws://localhost:8081/calibration/all")
+    ws.addEventListener("message", e => {
+      const response = JSON.parse(e.data)
+      console.log(response);
+      setCalibrationState(response.action)
+    })
+    ws.addEventListener("close", e => {
+      setCalibrationState("")
+      setMode("inactive")
+    })
+
+    // TODO: make this a signal so that can be set by the user
+    let gestures = [
+      [16, 0, 0, 0, 0],
+      [0, 16, 0, 0, 0],
+      [0, 0, 16, 0, 0],
+      [0, 0, 0, 16, 0],
+      [0, 0, 0, 0, 16],
+      [16, 16, 16, 16, 16],
+      [16, 0, 0, 16, 16]
+    ]
+
+    createEffect(() => {
+      console.log(accum())
+      if (accum() >= gestures.length * 5 * 60) {
+        switch (calibrationState()) {
+          case "start calibration":
+            let data = JSON.stringify({
+              "type": "stop",
+              "stop_time": Date.now()
+            })
+            console.log(data);
+            ws.send(JSON.stringify({
+              "type": "stop",
+              "stop_time": Date.now()
+            }))
+            clearInterval(intervalFunc)
+            break
+        }
+      }
+    })
+
+    setAccum(0)
+    const intervalFunc = setInterval(() => {
+      let section = Math.floor(accum() / 300)
+      let fp = (accum() / 300) - section
       let pos = 0
       if (fp > 0.9) {
-        pos = (1 - fp) * 160
+        pos = (1 - fp) * 10
       } else if (fp > 0.5) {
-        pos = 16
+        pos = 1
       } else if (fp > 0.4) {
-        pos = (fp - 0.4) * 160
+        pos = (fp - 0.4) * 10
       }
-      switch (finger) {
-        case 0:
-          setData([[pos, 0, 0, 0, 0]])
-          break
-        case 1 :
-          setData([[0, pos, 0, 0, 0]])
-          break
-        case 2 :
-          setData([[0, 0, pos, 0, 0]])
-          break
-        case 3:
-          setData([[0, 0, 0, pos, 0]])
-          break
-        case 4 :
-          setData([[0, 0, 0, 0, pos]])
-          break
-        case 5 :
-          setData([[pos, pos, pos, pos, pos]])
-          break
-        default :
-          return
-      }
-      ++accum
-    }, 16)
-    if (accum > 1800) {
-      console.log("fuck");
-      clearInterval(intervalFunc)
-    }
+
+      setData([gestures[section].map(element => pos * element)])
+
+      setAccum(accum() + 1)
+    }, 16.666666)
+
   }
 
   const start_infer = () => {
-    ws = createWS("ws://localhost:8081/infer/" + model)
+    ws = createWS("ws://localhost:8081/infer/" + model())
     ws.addEventListener("message", e => {
       const response = JSON.parse(e.data)
       setData(response.prediction)
@@ -116,6 +148,7 @@ function App() {
 
   return (
     <>
+      <h1 style={{position: "absolute"}}>{mode() + calibrationState()}</h1>
       <Panel mode={mode} switchMode={switchMode} toggleModalVisibility={toggleModalVisibility}/>
       <Scene curls={data} mode={mode} setMode={setMode}/>
       <Show when={modalVisibility() === true} fallback={<div/>}>
