@@ -92,23 +92,22 @@ function App() {
       [0, 0, 0, 16, 0],
       [0, 0, 0, 0, 16],
       [16, 16, 16, 16, 16],
-      [16, 0, 0, 16, 16]
+      [16, 0, 0, 16, 16],
     ]
 
+
     createEffect(() => {
-      console.log(accum())
+      // console.log(accum())
       if (accum() >= gestures.length * 5 * 60) {
+        let data = JSON.stringify({
+          "type": "stop",
+          "start_time": start_time,
+          "stop_time": stop_time,
+        })
+        console.log(data);
         switch (calibrationState()) {
           case "start calibration":
-            let data = JSON.stringify({
-              "type": "stop",
-              "stop_time": Date.now()
-            })
-            console.log(data);
-            ws.send(JSON.stringify({
-              "type": "stop",
-              "stop_time": Date.now()
-            }))
+            ws.send(data)
             clearInterval(intervalFunc)
             break
         }
@@ -116,6 +115,8 @@ function App() {
     })
 
     setAccum(0)
+    const start_time = Date.now()
+    let stop_time = null
     const intervalFunc = setInterval(() => {
       let section = Math.floor(accum() / 300)
       let fp = (accum() / 300) - section
@@ -130,7 +131,8 @@ function App() {
 
       setData([gestures[section].map(element => pos * element)])
 
-      setAccum(accum() + 1)
+      setAccum(Math.floor(Date.now() - start_time) / 16.666666)
+      stop_time = Date.now()
     }, 16.666666)
 
   }
