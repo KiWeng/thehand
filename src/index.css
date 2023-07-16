@@ -1,5 +1,7 @@
 body {
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
   'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -9,4 +11,23 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
   monospace;
+}
+
+.panel {
+  width: inherit;
+  display: inline-block;
+  position: absolute;
+  bottom: 0;
+  width: -webkit-fill-available;
+  outline: black dot-dash;
+}
+
+.panel-button {
+  width: inherit;
+}
+
+.panel-wrapper {
+  display: flex;
+  justify-content: center;
+  height: 100%;
 }

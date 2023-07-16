@@ -4,22 +4,27 @@
 
 ### Basics
 
-- [ ] A threejs rendered hand as background
-- [ ] Menu with following options:
-    - [ ] Begin calibration
-    - [ ] Load profile
-    - [ ] Begin prediction
+- [x] A threejs rendered hand as background
+- [x] Menu with following options:
+    - [x] Begin calibration
+    - [x] Load profile
+        - [x] Popout dialog for model selection
+    - [x] Begin prediction
 
 ### Calibration session
 
-- [ ] Post start&end request to the server
-- [ ] Show the calibration instructions
+- [x] Post start&end request to the server
+- [x] Show the calibration instructions
+- [x] Set target model name
+- [x] Show calibration states
+- [ ] custom calibration menu
 
 ### Prediction session
 
 - [ ] Post start&end request to the server
-- [ ] Receiving predicted data@50Hz with websocket
-- [ ] Show hands
+- [x] Receiving predicted data@50Hz with websocket
+    - *@10-30Hz roughly due to the processing speed of the server*
+- [x] Show hands
 
 ### Miscellaneous
 

@@ -79,7 +79,8 @@ function Scene(props) {
 
   function animate() {
     requestAnimationFrame(animate)
-    predictHand.updateHandPoseEach(predict_curl[0])
+    if (predict_curl !== undefined)
+      predictHand.updateHandPoseEach(predict_curl[0])
     controls.update()
     render()
   }
