@@ -3,15 +3,39 @@ import {createEffect, createSignal, Show} from "solid-js";
 import {createWS} from "@solid-primitives/websocket";
 import Panel from "./Panel";
 import ModelModal from "./ModelModal"
+import {Spinner} from '@papanasi/solid';
+import '@papanasi/solid/papanasi.css';
+import './loading.css'
 
 function App() {
   let id = 0
 
+  // TODO: make this a signal so that can be set by the user
+  let defaultGestures = [
+    [16, 0, 0, 0, 0],
+    [0, 16, 0, 0, 0],
+    [0, 0, 16, 0, 0],
+    [0, 0, 0, 16, 0],
+    [0, 0, 0, 0, 16],
+    [16, 16, 16, 16, 16],
+    [16, 0, 0, 16, 16],
+    [0, 0, 16, 16, 0],
+    [16, 0, 0, 0, 0],
+    [0, 16, 0, 0, 0],
+    [0, 0, 16, 0, 0],
+    [0, 0, 0, 16, 0],
+    [0, 0, 0, 0, 16],
+    [16, 16, 16, 16, 16],
+  ]
+
+
   const [data, setData] = createSignal([[0, 0, 0, 0, 0]]);
   const [mode, setMode] = createSignal("inactive")
-  const [model, setModel] = createSignal("base")
+  const [model, setModel] = createSignal("tmp")
+  const [newModel, setNewModel] = createSignal("tmp")
   const [modelList, setModelList] = createSignal([])
   const [modalVisibility, setModalVisibility] = createSignal(false)
+  const [gestures, setGestures] = createSignal(defaultGestures)
   const [calibrationState, setCalibrationState] = createSignal("")
   const [accum, setAccum] = createSignal(0)
 
@@ -70,10 +94,14 @@ function App() {
     }
   })
 
-  // TOOD: post start&end request
   const start_calibration = () => {
-    // ws = createWS("ws://localhost:8081/calibration/" + model) TODO
-    ws = createWS("ws://localhost:8081/calibration/all")
+    ws = createWS("ws://localhost:8081/calibration/" + model())
+    let data = JSON.stringify({
+      "type": "start",
+      "gestures": gestures(),
+      "new_model_name": newModel(),
+    })
+    ws.send(data)
     ws.addEventListener("message", e => {
       const response = JSON.parse(e.data)
       console.log(response);
@@ -84,21 +112,9 @@ function App() {
       setMode("inactive")
     })
 
-    // TODO: make this a signal so that can be set by the user
-    let gestures = [
-      [16, 0, 0, 0, 0],
-      [0, 16, 0, 0, 0],
-      [0, 0, 16, 0, 0],
-      [0, 0, 0, 16, 0],
-      [0, 0, 0, 0, 16],
-      [16, 16, 16, 16, 16],
-      [16, 0, 0, 16, 16],
-    ]
-
-
     createEffect(() => {
       // console.log(accum())
-      if (accum() >= gestures.length * 5 * 60) {
+      if (accum() >= gestures().length * 5 * 60) {
         let data = JSON.stringify({
           "type": "stop",
           "start_time": start_time,
@@ -129,7 +145,7 @@ function App() {
         pos = (fp - 0.4) * 10
       }
 
-      setData([gestures[section].map(element => pos * element)])
+      setData([gestures()[section].map(element => pos * element)])
 
       setAccum(Math.floor(Date.now() - start_time) / 16.666666)
       stop_time = Date.now()
@@ -150,8 +166,12 @@ function App() {
 
   return (
     <>
-      <h1 style={{position: "absolute"}}>{mode() + calibrationState()}</h1>
-      <Panel mode={mode} switchMode={switchMode} toggleModalVisibility={toggleModalVisibility}/>
+      {/*<h1 style={{position: "absolute"}}>{mode() + calibrationState()}</h1>*/}
+      <Panel mode={mode} switchMode={switchMode} model={model} setNewModel={setNewModel}
+             toggleModalVisibility={toggleModalVisibility}/>
+      <Show when={calibrationState() === "start calibration"} fallback={<div/>}>
+        <Spinner full variant="primary"/>
+      </Show>
       <Scene curls={data} mode={mode} setMode={setMode}/>
       <Show when={modalVisibility() === true} fallback={<div/>}>
         <ModelModal model={model} setModel={setModel} modelList={modelList}/>

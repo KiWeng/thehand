@@ -8,6 +8,7 @@ function Panel(props) {
       <Row basic="content">
         <Column basic="fill">
           <button onClick={() => {
+            props.setNewModel(prompt("Name for the new model:", props.model()))
             props.switchMode("calibration")
           }} className={`pa-button--primary pa-button panel-button ${
             props.mode() === "recognition" ? "is-disabled" : ""

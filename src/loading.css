@@ -1,0 +1,6 @@
+.pa-spinner {
+  --pa-spinner-size: 8rem;
+  --pa-spinner-stroke: 4;
+  --pa-spinner-offset: 200;
+  --pa-spinner-duration: 4s;
+}
