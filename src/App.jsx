@@ -13,19 +13,21 @@ function App() {
   // TODO: make this a signal so that can be set by the user
   let defaultGestures = [
     [16, 0, 0, 0, 0],
-    [0, 16, 0, 0, 0],
-    [0, 0, 16, 0, 0],
-    [0, 0, 0, 16, 0],
-    [0, 0, 0, 0, 16],
-    [16, 16, 16, 16, 16],
-    [16, 0, 0, 16, 16],
-    [0, 0, 16, 16, 0],
+    [2, 12, 2, 2, 2],
+    [2, 2, 12, 2, 2],
+    [2, 2, 4, 12, 4],
+    [2, 2, 2, 6, 10],
+    [12, 16, 16, 16, 16],
+    // [12, 0, 0, 12, 12],
+    // [0, 0, 12, 12, 0],
     [16, 0, 0, 0, 0],
-    [0, 16, 0, 0, 0],
-    [0, 0, 16, 0, 0],
-    [0, 0, 0, 16, 0],
-    [0, 0, 0, 0, 16],
-    [16, 16, 16, 16, 16],
+    [2, 12, 2, 2, 2],
+    [2, 2, 12, 2, 2],
+    [2, 2, 4, 12, 4],
+    [2, 2, 2, 6, 10],
+    [12, 16, 16, 16, 16],
+    // [12, 0, 0, 12, 12],
+    // [0, 0, 12, 12, 0],
   ]
 
 
@@ -54,6 +56,7 @@ function App() {
         break
       case "calibration":
       case "recognition":
+      case "test":
         if (ws !== null) {
           ws.send("close")
           ws.close();
@@ -90,6 +93,9 @@ function App() {
         break
       case "calibration":
         start_calibration()
+        break
+      case "test":
+        start_test()
         break
     }
   })
@@ -152,6 +158,49 @@ function App() {
     }, 16.666666)
 
   }
+
+
+  const start_test = () => {
+    ws = createWS("ws://localhost:8081/test/" + model())
+    ws.addEventListener("close", e => {
+      setMode("inactive")
+    })
+
+    let repeats = 2
+
+    createEffect(() => {
+      // console.log(accum())
+      if (accum() >= gestures().length * repeats * 5 * 60) {
+        clearInterval(intervalFunc)
+        switchMode('inactive')
+      }
+    })
+
+    setAccum(0)
+    const start_time = Date.now()
+    let stop_time = null
+    const intervalFunc = setInterval(() => {
+      let section = Math.floor(accum() / 300)
+      let fp = (accum() / 300) - section
+      let pos = 0
+      if (fp > 0.9) {
+        pos = (1 - fp) * 10
+      } else if (fp > 0.5) {
+        pos = 1
+      } else if (fp > 0.4) {
+        pos = (fp - 0.4) * 10
+      }
+
+      setData([gestures()[section % gestures().length].map(
+        element => pos * element)]
+      )
+
+      setAccum(Math.floor(Date.now() - start_time) / 16.666666)
+      stop_time = Date.now()
+    }, 16.666666)
+
+  }
+
 
   const start_infer = () => {
     ws = createWS("ws://localhost:8081/infer/" + model())

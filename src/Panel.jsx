@@ -12,6 +12,8 @@ function Panel(props) {
             props.switchMode("calibration")
           }} className={`pa-button--primary pa-button panel-button ${
             props.mode() === "recognition" ? "is-disabled" : ""
+          }${
+            props.mode() === "test" ? "is-disabled" : ""
           }`}>Start Calibration
           </button>
         </Column>
@@ -31,7 +33,23 @@ function Panel(props) {
             }
           }} className={`pa-button--tertiary pa-button panel-button ${
             props.mode() === "calibration" ? "is-disabled" : ""
+          }${
+            props.mode() === "test" ? "is-disabled" : ""
           }`}> {props.mode() === 'recognition' ? "Stop" : "Start"} Recognition
+          </button>
+        </Column>
+        <Column basic="fill">
+          <button onClick={() => {
+            if (props.mode() === 'inactive') {
+              props.switchMode('test')
+            } else {
+              props.switchMode('inactive')
+            }
+          }} className={`pa-button--tertiary pa-button panel-button ${
+            props.mode() === "recognition" ? "is-disabled" : ""
+          }${
+            props.mode() === "calibration" ? "is-disabled" : ""
+          }`}> {props.mode() === 'test' ? "Stop" : "Start"} Testing
           </button>
         </Column>
       </Row>
